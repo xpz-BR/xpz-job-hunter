@@ -14,22 +14,38 @@ def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Table: user_profile (single-user or multi-profile support)
+    # Table: user_profile
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS user_profile (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         full_name TEXT DEFAULT '',
-        desired_roles TEXT DEFAULT '',        -- Comma or JSON array of roles
-        skills TEXT DEFAULT '',               -- Comma or JSON array of skills
-        experience_level TEXT DEFAULT 'junior', -- junior, pleno/mid, senior
-        education TEXT DEFAULT '',            -- High school, College, Bachelor, etc.
-        location TEXT DEFAULT '',             -- e.g. 'Brazil', 'São Paulo', 'Remote'
-        remote_only INTEGER DEFAULT 0,        -- 1 if remote only
+        category TEXT DEFAULT 'todos',
+        desired_roles TEXT DEFAULT '',
+        skills TEXT DEFAULT '',
+        experience_level TEXT DEFAULT 'junior',
+        shifts TEXT DEFAULT 'integral',
+        contract_types TEXT DEFAULT 'clt',
+        strict_level_filter INTEGER DEFAULT 1,
+        education TEXT DEFAULT '',
+        location TEXT DEFAULT '',
+        remote_only INTEGER DEFAULT 0,
         min_salary REAL DEFAULT 0,
         bio TEXT DEFAULT '',
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
+
+    # Safe column migrations if database already existed
+    columns = [row[1] for row in cursor.execute("PRAGMA table_info(user_profile)").fetchall()]
+    new_cols = {
+        "category": "TEXT DEFAULT 'todos'",
+        "shifts": "TEXT DEFAULT 'integral'",
+        "contract_types": "TEXT DEFAULT 'clt'",
+        "strict_level_filter": "INTEGER DEFAULT 1"
+    }
+    for col_name, col_type in new_cols.items():
+        if col_name not in columns:
+            cursor.execute(f"ALTER TABLE user_profile ADD COLUMN {col_name} {col_type};")
 
     # Table: saved_jobs (favorites)
     cursor.execute("""
@@ -43,6 +59,8 @@ def init_db():
         url TEXT,
         salary TEXT,
         job_type TEXT,
+        shift TEXT DEFAULT '',
+        category TEXT DEFAULT '',
         description TEXT,
         match_score INTEGER DEFAULT 0,
         matched_skills TEXT DEFAULT '[]',
@@ -51,21 +69,26 @@ def init_db():
     );
     """)
 
-    # Table: search_cache (to avoid re-scraping recently searched queries)
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS search_cache (
-        query_key TEXT PRIMARY KEY,
-        results_json TEXT NOT NULL,
-        cached_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    """)
+    # Check for shift and category in saved_jobs
+    saved_cols = [row[1] for row in cursor.execute("PRAGMA table_info(saved_jobs)").fetchall()]
+    if "shift" not in saved_cols:
+        cursor.execute("ALTER TABLE saved_jobs ADD COLUMN shift TEXT DEFAULT '';")
+    if "category" not in saved_cols:
+        cursor.execute("ALTER TABLE saved_jobs ADD COLUMN category TEXT DEFAULT '';")
 
     # Ensure at least one profile row exists
     cursor.execute("SELECT id FROM user_profile LIMIT 1;")
     if not cursor.fetchone():
         cursor.execute("""
-        INSERT INTO user_profile (full_name, desired_roles, skills, experience_level, education, location, remote_only)
-        VALUES ('Candidato', 'Desenvolvedor Python, Backend Developer', 'Python, FastAPI, SQL, Git, Docker', 'junior', 'Ensino Superior em Andamento', 'Brasil', 1);
+        INSERT INTO user_profile (
+            full_name, category, desired_roles, skills, experience_level, 
+            shifts, contract_types, strict_level_filter, education, location, remote_only
+        ) VALUES (
+            'Candidato', 'administracao', 'Assistente Administrativo, Auxiliar de Escritório', 
+            'Excel Avançado, Rotinas Administrativas, Atendimento ao Cliente, Faturamento', 
+            'junior', 'integral,manha', 'clt,estagio,aprendiz', 1, 
+            'Ensino Médio Completo / Superior Cursando', 'Brasil', 0
+        );
         """)
 
     conn.commit()
@@ -79,9 +102,10 @@ def get_profile() -> Dict[str, Any]:
     conn.close()
     if row:
         data = dict(row)
-        # Parse skills and roles into lists for easier frontend usage
-        data["skills_list"] = [s.strip() for s in data["skills"].split(",") if s.strip()]
-        data["roles_list"] = [r.strip() for r in data["desired_roles"].split(",") if r.strip()]
+        data["skills_list"] = [s.strip() for s in (data.get("skills") or "").split(",") if s.strip()]
+        data["roles_list"] = [r.strip() for r in (data.get("desired_roles") or "").split(",") if r.strip()]
+        data["shifts_list"] = [sh.strip() for sh in (data.get("shifts") or "").split(",") if sh.strip()]
+        data["contract_types_list"] = [c.strip() for c in (data.get("contract_types") or "").split(",") if c.strip()]
         return data
     return {}
 
@@ -91,9 +115,13 @@ def update_profile(data: Dict[str, Any]) -> Dict[str, Any]:
     cursor.execute("""
     UPDATE user_profile SET
         full_name = :full_name,
+        category = :category,
         desired_roles = :desired_roles,
         skills = :skills,
         experience_level = :experience_level,
+        shifts = :shifts,
+        contract_types = :contract_types,
+        strict_level_filter = :strict_level_filter,
         education = :education,
         location = :location,
         remote_only = :remote_only,
@@ -103,9 +131,13 @@ def update_profile(data: Dict[str, Any]) -> Dict[str, Any]:
     WHERE id = 1;
     """, {
         "full_name": data.get("full_name", ""),
+        "category": data.get("category", "todos"),
         "desired_roles": data.get("desired_roles", ""),
         "skills": data.get("skills", ""),
         "experience_level": data.get("experience_level", "junior"),
+        "shifts": data.get("shifts", "integral"),
+        "contract_types": data.get("contract_types", "clt"),
+        "strict_level_filter": 1 if data.get("strict_level_filter", True) else 0,
         "education": data.get("education", ""),
         "location": data.get("location", ""),
         "remote_only": 1 if data.get("remote_only") else 0,
@@ -122,8 +154,8 @@ def save_favorite_job(job: Dict[str, Any]) -> bool:
     try:
         cursor.execute("""
         INSERT OR REPLACE INTO saved_jobs 
-        (job_id, title, company, location, site, url, salary, job_type, description, match_score, matched_skills, missing_skills)
-        VALUES (:job_id, :title, :company, :location, :site, :url, :salary, :job_type, :description, :match_score, :matched_skills, :missing_skills)
+        (job_id, title, company, location, site, url, salary, job_type, shift, category, description, match_score, matched_skills, missing_skills)
+        VALUES (:job_id, :title, :company, :location, :site, :url, :salary, :job_type, :shift, :category, :description, :match_score, :matched_skills, :missing_skills)
         """, {
             "job_id": str(job.get("id") or job.get("job_id") or job.get("url")),
             "title": job.get("title", "Sem título"),
@@ -133,6 +165,8 @@ def save_favorite_job(job: Dict[str, Any]) -> bool:
             "url": job.get("url", ""),
             "salary": job.get("salary", ""),
             "job_type": job.get("job_type", ""),
+            "shift": job.get("shift", ""),
+            "category": job.get("category", ""),
             "description": job.get("description", ""),
             "match_score": job.get("match_score", 0),
             "matched_skills": json.dumps(job.get("matched_skills", [])),

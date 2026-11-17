@@ -16,6 +16,7 @@
     --accent-emerald: #10b981;
     --accent-amber: #f59e0b;
     --accent-rose: #f43f5e;
+    --accent-purple: #8b5cf6;
     
     --radius-sm: 6px;
     --radius-md: 10px;
@@ -98,11 +99,11 @@ body {
     font-size: 0.65rem;
     font-weight: 700;
     text-transform: uppercase;
-    background: rgba(59, 130, 246, 0.15);
-    color: #60a5fa;
-    padding: 2px 6px;
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    padding: 2px 7px;
     border-radius: var(--radius-full);
-    border: 1px solid rgba(59, 130, 246, 0.3);
+    border: 1px solid rgba(16, 185, 129, 0.3);
     margin-left: 4px;
 }
 
@@ -200,7 +201,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* HERO CARD & SEARCH */
+/* HERO SEARCH CARD */
 .hero-card {
     background: linear-gradient(145deg, #131b2e 0%, var(--bg-card) 100%);
     border: 1px solid var(--border-color);
@@ -220,7 +221,7 @@ body {
 .hero-header p {
     color: var(--text-secondary);
     font-size: 0.95rem;
-    max-width: 800px;
+    max-width: 820px;
     margin-bottom: 1.75rem;
 }
 
@@ -258,6 +259,32 @@ body {
     color: var(--accent-blue);
 }
 
+/* Search Dropdowns Row (Area, Turno, Contrato, Match) */
+.search-dropdowns-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.filter-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.filter-box label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
 input[type="text"],
 input[type="number"],
 select,
@@ -267,7 +294,7 @@ textarea {
     color: var(--text-primary);
     padding: 0.75rem 1rem;
     border-radius: var(--radius-md);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     outline: none;
     transition: var(--transition);
     width: 100%;
@@ -304,24 +331,36 @@ textarea:focus {
     box-shadow: 0 4px 15px rgba(59, 130, 246, 0.35);
 }
 
-.btn-primary:active {
-    transform: translateY(0);
-}
-
 .search-options-row {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 0.5rem;
     gap: 1rem;
 }
 
-.options-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-muted);
+.toggle-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.toggle-checkbox-label input {
+    accent-color: var(--accent-blue);
+    width: 18px;
+    height: 18px;
+}
+
+.toggle-checkbox-label span strong {
+    color: var(--text-primary);
+}
+
+.toggle-checkbox-label i {
+    color: var(--accent-emerald);
 }
 
 .sources-selector {
@@ -345,19 +384,7 @@ textarea:focus {
     accent-color: var(--accent-blue);
 }
 
-.filter-match {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.filter-match select {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.85rem;
-    width: auto;
-}
-
-/* PROFILE TIP CARD */
+/* PROFILE SUMMARY ALERT */
 .profile-tip-card {
     background-color: rgba(59, 130, 246, 0.08);
     border: 1px solid rgba(59, 130, 246, 0.25);
@@ -370,7 +397,7 @@ textarea:focus {
 }
 
 .profile-tip-card i {
-    color: #60a5fa;
+    color: #34d399;
     font-size: 1.2rem;
 }
 
@@ -438,12 +465,12 @@ textarea:focus {
     font-weight: 600;
 }
 
-/* LOADING STATE */
-.loading-state {
+/* LOADING & EMPTY STATES */
+.loading-state, .empty-state {
     text-align: center;
     padding: 4rem 1rem;
     background-color: var(--bg-card);
-    border: 1px dashed var(--border-color);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     margin: 1.5rem 0;
 }
@@ -476,50 +503,9 @@ textarea:focus {
     }
 }
 
-.loading-state h4 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 0.4rem;
-}
+.hidden { display: none !important; }
 
-.loading-state p {
-    color: var(--text-muted);
-    font-size: 0.85rem;
-}
-
-/* EMPTY STATE */
-.empty-state {
-    text-align: center;
-    padding: 4rem 1rem;
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    color: var(--text-muted);
-}
-
-.empty-state i {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: var(--text-muted);
-}
-
-.empty-state h4 {
-    font-size: 1.15rem;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-}
-
-.empty-state p {
-    font-size: 0.9rem;
-    max-width: 450px;
-    margin: 0 auto;
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* JOBS GRID & JOB CARD */
+/* JOB CARDS & BADGES */
 .jobs-grid {
     display: flex;
     flex-direction: column;
@@ -533,8 +519,6 @@ textarea:focus {
     padding: 1.5rem;
     box-shadow: var(--shadow-card);
     transition: var(--transition);
-    position: relative;
-    overflow: hidden;
 }
 
 .job-card:hover {
@@ -569,7 +553,6 @@ textarea:focus {
 .job-title {
     font-size: 1.25rem;
     font-weight: 800;
-    letter-spacing: -0.3px;
     color: var(--text-primary);
     text-decoration: none;
     transition: var(--transition);
@@ -602,13 +585,21 @@ textarea:focus {
     border: 1px solid rgba(59, 130, 246, 0.25);
 }
 
-.badge-site.linkedin { background-color: rgba(10, 102, 194, 0.2); color: #38bdf8; border-color: rgba(10, 102, 194, 0.4); }
-.badge-site.indeed { background-color: rgba(33, 100, 243, 0.2); color: #60a5fa; border-color: rgba(33, 100, 243, 0.4); }
-.badge-site.remotive { background-color: rgba(139, 92, 246, 0.2); color: #c084fc; border-color: rgba(139, 92, 246, 0.4); }
-
 .badge-location {
     background-color: rgba(255, 255, 255, 0.05);
     color: var(--text-secondary);
+}
+
+.badge-shift {
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.badge-contract {
+    background-color: rgba(139, 92, 246, 0.15);
+    color: #c084fc;
+    border: 1px solid rgba(139, 92, 246, 0.25);
 }
 
 .badge-salary {
@@ -617,12 +608,7 @@ textarea:focus {
     border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
-.badge-remote {
-    background-color: rgba(99, 102, 241, 0.15);
-    color: #a5b4fc;
-}
-
-/* MATCH SCORE CONTAINER */
+/* MATCH BAR & CONTAINER */
 .match-container {
     background-color: rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -666,7 +652,6 @@ textarea:focus {
     transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Match Colors */
 .score-high .match-bar-fill { background: linear-gradient(90deg, #10b981, #34d399); }
 .score-high .match-percent, .score-high .match-title { color: var(--accent-emerald); }
 
@@ -676,7 +661,6 @@ textarea:focus {
 .score-low .match-bar-fill { background: linear-gradient(90deg, #64748b, #94a3b8); }
 .score-low .match-percent, .score-low .match-title { color: var(--text-secondary); }
 
-/* SKILLS ROW IN CARD */
 .skills-comparison-row {
     display: flex;
     flex-wrap: wrap;
@@ -705,13 +689,6 @@ textarea:focus {
 .skill-tag.missing {
     background-color: rgba(255, 255, 255, 0.04);
     color: var(--text-muted);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.skill-tag.extra {
-    background-color: rgba(59, 130, 246, 0.1);
-    color: #93c5fd;
-    border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .job-desc-snippet {
@@ -769,18 +746,173 @@ textarea:focus {
     transition: var(--transition);
 }
 
-.btn-fav:hover {
-    color: var(--accent-amber);
-    border-color: var(--accent-amber);
-}
-
 .btn-fav.saved {
     color: var(--accent-amber);
     background-color: rgba(245, 158, 11, 0.12);
     border-color: rgba(245, 158, 11, 0.3);
 }
 
-/* PROFILE SECTION STYLES */
+/* ======================================================== */
+/* PRESET SELECTION STYLES (LINKEDIN STYLE) */
+/* ======================================================== */
+.preset-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title i {
+    color: var(--accent-blue);
+}
+
+/* Category Grid */
+.category-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+}
+
+.category-card-btn {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1rem 0.85rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.category-card-btn i {
+    font-size: 1.5rem;
+    color: var(--accent-blue);
+}
+
+.category-card-btn span {
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.category-card-btn:hover {
+    border-color: var(--accent-blue);
+    background-color: var(--bg-card-hover);
+    color: var(--text-primary);
+}
+
+.category-card-btn.active {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(99, 102, 241, 0.25));
+    border-color: var(--accent-blue);
+    color: #fff;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+}
+
+/* Preset Pills Box (Roles & Skills) */
+.preset-pills-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    min-height: 48px;
+}
+
+.preset-pill {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 0.45rem 0.85rem;
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: var(--transition);
+    user-select: none;
+}
+
+.preset-pill:hover {
+    border-color: var(--accent-blue);
+    color: var(--text-primary);
+}
+
+.preset-pill.active {
+    background-color: rgba(59, 130, 246, 0.2);
+    border-color: var(--accent-blue);
+    color: #60a5fa;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.25);
+}
+
+.preset-pill.active i {
+    color: var(--accent-blue);
+}
+
+/* Custom Add Row */
+.custom-add-row {
+    display: flex;
+    gap: 0.5rem;
+    max-width: 500px;
+}
+
+.custom-add-row input {
+    padding: 0.5rem 0.85rem;
+    font-size: 0.85rem;
+}
+
+/* Checkbox Pills Grid (Shifts & Contracts) */
+.checkbox-pills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.checkbox-pill-label {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 0.5rem 0.9rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+}
+
+.checkbox-pill-label input {
+    accent-color: var(--accent-blue);
+    width: 16px;
+    height: 16px;
+}
+
+.checkbox-pill-label:hover {
+    border-color: var(--accent-blue);
+    color: var(--text-primary);
+}
+
+.checkbox-pill-label.active {
+    border-color: var(--accent-blue);
+    background-color: rgba(59, 130, 246, 0.15);
+    color: #fff;
+}
+
+/* PROFILE CARD & FORM */
 .profile-card {
     background-color: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -810,16 +942,6 @@ textarea:focus {
     color: #fff;
 }
 
-.profile-card-header h2 {
-    font-size: 1.5rem;
-    font-weight: 800;
-}
-
-.profile-card-header p {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-}
-
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -827,37 +949,7 @@ textarea:focus {
     margin-bottom: 1.5rem;
 }
 
-.form-group.full-width {
-    grid-column: span 2;
-}
-
-.label-hint {
-    color: var(--text-muted);
-    font-weight: 400;
-    font-size: 0.75rem;
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: var(--text-primary);
-}
-
-.checkbox-label input {
-    accent-color: var(--accent-blue);
-    width: 18px;
-    height: 18px;
-}
-
-.skills-preview {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-top: 0.5rem;
-}
+.form-group.full-width { grid-column: span 2; }
 
 .form-actions {
     display: flex;
@@ -914,22 +1006,17 @@ textarea:focus {
     color: var(--text-secondary);
     text-decoration: none;
     font-weight: 600;
-    transition: var(--transition);
 }
 
 .footer-links a:hover {
     color: var(--accent-blue);
 }
 
-/* RESPONSIVE DESIGN */
+/* RESPONSIVE */
 @media (max-width: 768px) {
     .nav-container {
         flex-direction: column;
         align-items: stretch;
-    }
-    .nav-links {
-        overflow-x: auto;
-        padding-bottom: 0.25rem;
     }
     .search-inputs-row {
         flex-direction: column;
@@ -941,7 +1028,7 @@ textarea:focus {
     .form-group.full-width {
         grid-column: span 1;
     }
-    .job-card-top {
-        flex-direction: column;
+    .category-selector-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
