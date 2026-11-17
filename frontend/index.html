@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job-Hunter | Encontre Vagas Sob Medida</title>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-crosshairs"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Job<span>Hunter</span></h1>
+                    <span class="badge-open">Open Source</span>
+                </div>
+            </div>
+
+            <nav class="nav-links">
+                <button class="nav-tab active" data-tab="search-section">
+                    <i class="fa-solid fa-magnifying-glass"></i> Buscar Vagas
+                </button>
+                <button class="nav-tab" data-tab="profile-section">
+                    <i class="fa-solid fa-user-gear"></i> Meu Perfil & Habilidades
+                </button>
+                <button class="nav-tab" data-tab="favorites-section">
+                    <i class="fa-solid fa-bookmark"></i> Vagas Salvas <span class="badge-count" id="fav-count">0</span>
+                </button>
+            </nav>
+
+            <div class="user-pill" id="user-status-pill" title="Clique para editar o perfil">
+                <i class="fa-solid fa-circle-user"></i>
+                <span id="pill-name">Carregando...</span>
+                <span class="pill-level" id="pill-level">Júnior</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Toast Notification Container -->
+        <div id="toast-container" class="toast-container"></div>
+
+        <!-- SECTION 1: SEARCH & JOBS -->
+        <section id="search-section" class="tab-content active">
+            <!-- Hero Search Card -->
+            <div class="hero-card">
+                <div class="hero-header">
+                    <h2>Encontre a vaga perfeita com base no seu perfil</h2>
+                    <p>O algoritmo do Job-Hunter analisa seu conjunto de habilidades, nível e interesses para calcular o percentual de compatibilidade de cada oportunidade.</p>
+                </div>
+
+                <form id="search-form" class="search-form">
+                    <div class="search-inputs-row">
+                        <div class="input-group flex-2">
+                            <label><i class="fa-solid fa-briefcase"></i> Cargo ou Tecnologia</label>
+                            <input type="text" id="search-query" placeholder="Ex: Desenvolvedor Python, Backend, React..." />
+                        </div>
+                        <div class="input-group flex-1">
+                            <label><i class="fa-solid fa-location-dot"></i> Localização</label>
+                            <input type="text" id="search-location" value="Brasil" placeholder="Ex: Brasil, Remoto, SP..." />
+                        </div>
+                        <button type="submit" class="btn-primary" id="btn-search">
+                            <i class="fa-solid fa-bolt"></i> Buscar Vagas
+                        </button>
+                    </div>
+
+                    <!-- Search Filters & Sources -->
+                    <div class="search-options-row">
+                        <div class="sources-selector">
+                            <span class="options-label">Fontes integradas:</span>
+                            <label class="checkbox-badge">
+                                <input type="checkbox" name="source" value="jobspy" checked>
+                                <span><i class="fa-brands fa-linkedin"></i> LinkedIn & Indeed</span>
+                            </label>
+                            <label class="checkbox-badge">
+                                <input type="checkbox" name="source" value="remotive" checked>
+                                <span><i class="fa-solid fa-globe"></i> Remotive (Remoto Tech)</span>
+                            </label>
+                            <label class="checkbox-badge">
+                                <input type="checkbox" name="source" value="arbeitnow" checked>
+                                <span><i class="fa-solid fa-network-wired"></i> Arbeitnow (API)</span>
+                            </label>
+                        </div>
+
+                        <div class="filter-match">
+                            <span class="options-label">Compatibilidade Mínima:</span>
+                            <select id="min-match-filter">
+                                <option value="0">Qualquer compatibilidade (Todas)</option>
+                                <option value="50">Pelo menos 50% de aderência</option>
+                                <option value="70">Pelo menos 70% de aderência</option>
+                                <option value="85">Super Match (85%+)</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Profile Summary Alert (If missing skills) -->
+            <div class="profile-tip-card" id="profile-tip">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <div class="tip-text">
+                    <strong>Calculando compatibilidade com suas habilidades cadastradas:</strong>
+                    <div class="quick-skills-tags" id="active-profile-skills">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+                <button class="btn-outline-sm" id="btn-quick-edit-profile">Editar Habilidades</button>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-header">
+                <div>
+                    <h3 id="results-title">Vagas Encontradas</h3>
+                    <p id="results-subtitle">Clique em "Buscar Vagas" ou edite seu perfil para ver as oportunidades ordenadas por aderência.</p>
+                </div>
+                <div class="results-sorter">
+                    <span id="results-count" class="badge-total">0 vagas</span>
+                </div>
+            </div>
+
+            <!-- Loading Spinner State -->
+            <div id="loading-state" class="loading-state hidden">
+                <div class="radar-spinner">
+                    <div class="pulse"></div>
+                    <i class="fa-solid fa-crosshairs"></i>
+                </div>
+                <h4>Rastreando vagas e calculando compatibilidade...</h4>
+                <p>Isso pode levar alguns segundos enquanto consultamos as fontes em tempo real.</p>
+            </div>
+
+            <!-- Jobs Grid -->
+            <div id="jobs-container" class="jobs-grid">
+                <!-- Dynamically populated job cards -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state hidden">
+                <i class="fa-solid fa-folder-open"></i>
+                <h4>Nenhuma vaga encontrada com os filtros atuais</h4>
+                <p>Tente diminuir a nota de compatibilidade mínima ou pesquisar por termos mais abrangentes.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 2: USER PROFILE -->
+        <section id="profile-section" class="tab-content">
+            <div class="profile-container">
+                <div class="profile-card">
+                    <div class="profile-card-header">
+                        <div class="card-icon"><i class="fa-solid fa-id-card-clip"></i></div>
+                        <div>
+                            <h2>Configurar Perfil do Candidato</h2>
+                            <p>Preencha suas informações com precisão. O algoritmo usa esses dados para dar match nas descrições de vagas.</p>
+                        </div>
+                    </div>
+
+                    <form id="profile-form" class="profile-form">
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="profile-name"><i class="fa-solid fa-user"></i> Nome Completo</label>
+                                <input type="text" id="profile-name" placeholder="Seu nome ou apelido profissional">
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="profile-roles">
+                                    <i class="fa-solid fa-bullseye"></i> Cargos de Interesse
+                                    <span class="label-hint">(Separe por vírgulas)</span>
+                                </label>
+                                <input type="text" id="profile-roles" placeholder="Ex: Desenvolvedor Python, Backend Developer, Engenheiro de Software Júnior">
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="profile-skills">
+                                    <i class="fa-solid fa-code"></i> Suas Habilidades Técnicas & Tecnologias
+                                    <span class="label-hint">(Separe por vírgulas - essenciais para o match)</span>
+                                </label>
+                                <textarea id="profile-skills" rows="3" placeholder="Ex: Python, FastAPI, Docker, SQL, PostgreSQL, Git, JavaScript, Linux, REST APIs"></textarea>
+                                <div class="skills-preview" id="profile-skills-preview"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profile-level"><i class="fa-solid fa-chart-line"></i> Nível Profissional</label>
+                                <select id="profile-level">
+                                    <option value="estagio">Estágio / Trainee</option>
+                                    <option value="junior">Júnior (Iniciante)</option>
+                                    <option value="pleno">Pleno (Mid-Level)</option>
+                                    <option value="senior">Sênior / Especialista</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profile-education"><i class="fa-solid fa-graduation-cap"></i> Formação / Estudos</label>
+                                <input type="text" id="profile-education" placeholder="Ex: Ciência da Computação (Cursando), ADS, Autodidata...">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profile-location"><i class="fa-solid fa-map-pin"></i> Sua Região / Cidade</label>
+                                <input type="text" id="profile-location" placeholder="Ex: São Paulo, Brasil">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="profile-salary"><i class="fa-solid fa-dollar-sign"></i> Pretensão Salarial Mínima (R$)</label>
+                                <input type="number" id="profile-salary" placeholder="Ex: 4000">
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="profile-remote">
+                                    <span><strong>Priorizar vagas 100% Remotas</strong> (Aumenta o score de posições Home Office)</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="profile-bio"><i class="fa-solid fa-align-left"></i> Resumo / Bio Profissional</label>
+                                <textarea id="profile-bio" rows="2" placeholder="Breve resumo sobre seus objetivos e foco de carreira..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary" id="btn-save-profile">
+                                <i class="fa-solid fa-check"></i> Salvar e Atualizar Perfil
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: FAVORITES -->
+        <section id="favorites-section" class="tab-content">
+            <div class="favorites-container">
+                <div class="results-header">
+                    <div>
+                        <h2>Vagas Salvas para Candidatura</h2>
+                        <p>Oportunidades que você guardou no seu banco de dados local SQLite.</p>
+                    </div>
+                </div>
+
+                <div id="favorites-container" class="jobs-grid">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div id="favorites-empty" class="empty-state hidden">
+                    <i class="fa-regular fa-bookmark"></i>
+                    <h4>Você ainda não favoritou nenhuma vaga</h4>
+                    <p>Durante suas pesquisas, clique no ícone de marcador para guardar as melhores vagas aqui.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p><strong>Job-Hunter</strong> — Desenvolvido com Python, FastAPI & SQLite. Projeto Open Source para busca inteligente de empregos.</p>
+        <p class="footer-links">
+            <a href="https://github.com/xpz-BR/xpz-job-hunter" target="_blank" rel="noopener noreferrer">
+                <i class="fa-brands fa-github"></i> Repositório no GitHub
+            </a>
+        </p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
